@@ -86,7 +86,7 @@ class Graph(object):
         Store the edge values in each spot,
         and a 0 if no edge exists."""
         max_index = self.find_max_index()
-        adjacency_matrix = [[0] * (max_index) for _ in range(max_index)]
+        adjacency_matrix = [[0] * (max_index+1) for _ in range(max_index)]
         for edg in self.edges:
             from_index, to_index = edg.node_from.value, edg.node_to.value
             adjacency_matrix[from_index][to_index] = edg.value
@@ -127,7 +127,10 @@ class Graph(object):
             start_node.visited = True
             ret_list = [start_node.value]
             for edge in start_node.edges:
-                ret_list.extend(self.dfs_helper(edge.node_to))
+                if( edge.node_to.value != start_node.value ):
+                  ret_list.extend(self.dfs_helper(edge.node_to))
+                else:
+                  ret_list.extend(self.dfs_helper(edge.node_from))
         
         return ret_list
 
@@ -137,7 +140,7 @@ class Graph(object):
         ARGUMENTS: start_node_num is the starting node number (integer)
         MODIFIES: the value of the visited property of nodes in self.nodes
         RETURN: a list of the node values (integers)."""
-        self._clear_visited()
+        #self._clear_visited()
         start_node = self.find_node(start_node_num)
         return self.dfs_helper(start_node)
 
@@ -145,66 +148,48 @@ class Graph(object):
 # Has 5 islands
 Mat2D = [ [1, 1, 0, 0, 0],
           [0, 1, 0, 0, 1],
-          [1, 0, 0, 1, 1],
-          [0, 0, 0, 0, 0],
-          [1, 0, 1, 0, 1]]                          
+          [1, 0, 1, 1, 1],
+          [1, 0, 0, 0, 1],
+          [1, 0, 1, 0, 1],
+          [0, 0, 1, 0, 0] ]                          
 
 graph = Graph()
 
-N = len(Mat2D[0]
+N = len(Mat2D[0])
+M = len(Mat2D)
 
-for i in range(N):
+# populate graph
+for i in range(M):
     for j in range(N):
-        graph.
-        if( Mat2D[i][j] == 1 )
+        if( Mat2D[i][j] == 1 ):
+          graph.insert_node(i*N+j)
+          if( j > 0 and Mat2D[i][j-1] == 1): # horizontal edge
+            graph.insert_edge(Mat2D[i][j], i*N+j-1, i*N+j)
+            
+          if( i > 0 and Mat2D[i-1][j] == 1): # top edge
+            graph.insert_edge(Mat2D[i][j], (i-1)*N+j, i*N+j)
+            
+          if( i > 0 and j > 0 and Mat2D[i-1][j-1] == 1 ): # left diganonal edge
+            graph.insert_edge(Mat2D[i][j], (i-1)*N+j-1, i*N+j)
+            
+          if( i > 0 and j < N-1 and Mat2D[i-1][j+1] == 1 ): # right diagnonal edge
+            graph.insert_edge(Mat2D[i][j], (i-1)*N+j+1, i*N+j)
+            
 
-
-
-
-graph.insert_edge(51, 0, 1)     # MV <-> SF
-graph.insert_edge(51, 1, 0)     # SF <-> MV
-graph.insert_edge(9950, 0, 3)   # MV <-> Shanghai
-graph.insert_edge(9950, 3, 0)   # Shanghai <-> MV
-graph.insert_edge(10375, 0, 5)  # MV <-> Sao Paolo
-graph.insert_edge(10375, 5, 0)  # Sao Paolo <-> MV
-graph.insert_edge(9900, 1, 3)   # SF <-> Shanghai
-graph.insert_edge(9900, 3, 1)   # Shanghai <-> SF
-graph.insert_edge(9130, 1, 4)   # SF <-> Berlin
-graph.insert_edge(9130, 4, 1)   # Berlin <-> SF
-graph.insert_edge(9217, 2, 3)   # London <-> Shanghai
-graph.insert_edge(9217, 3, 2)   # Shanghai <-> London
-graph.insert_edge(932, 2, 4)    # London <-> Berlin
-graph.insert_edge(932, 4, 2)    # Berlin <-> London
-graph.insert_edge(9471, 2, 5)   # London <-> Sao Paolo
-graph.insert_edge(9471, 5, 2)   # Sao Paolo <-> London
-# (6) 'Bangalore' is intentionally disconnected (no edges)
-# for this problem and should produce None in the
-# Adjacency List, etc.
-
+# traverse graph to find connected nodes
+cLst = []
+graph._clear_visited()
+for i in range(M):
+  for j in range(N):
+    if( Mat2D[i][j] == 1 ):
+      tLst = graph.dfs( i*N + j )
+      if( tLst ):
+        cLst.append(tLst)
+        
+print("Number of islands:", len(cLst))
+print( cLst )
+      
 import pprint
 pp = pprint.PrettyPrinter(indent=2)
-
-print "Edge List"
-pp.pprint(graph.get_edge_list_names())
-
-print "\nAdjacency List"
-pp.pprint(graph.get_adjacency_list_names())
-
-print "\nAdjacency Matrix"
-pp.pprint(graph.get_adjacency_matrix())
-
-print "\nDepth First Search"
-pp.pprint(graph.dfs_names(2))
-
-# Should print:
-# Depth First Search
-# ['London', 'Shanghai', 'Mountain View', 'San Francisco', 'Berlin', 'Sao Paolo']
-
-print "\nBreadth First Search"
-pp.pprint(graph.bfs_names(2))
-# test error reporting
-# pp.pprint(['Sao Paolo', 'Mountain View', 'San Francisco', 'London', 'Shanghai', 'Berlin'])
-
-# Should print:
-# Breadth First Search
-# ['London', 'Shanghai', 'Berlin', 'Sao Paolo', 'Mountain View', 'San Francisco']
+#pp.pprint(graph.get_edge_list())
+#pp.pprint(graph.get_adjacency_matrix())
