@@ -85,8 +85,8 @@ class Graph(object):
         column numbers represent to nodes.
         Store the edge values in each spot,
         and a 0 if no edge exists."""
-        max_index = self.find_max_index()
-        adjacency_matrix = [[0] * (max_index+1) for _ in range(max_index)]
+        max_index = self.find_max_index() + 1
+        adjacency_matrix = [[0] * (max_index) for _ in range(max_index)]
         for edg in self.edges:
             from_index, to_index = edg.node_from.value, edg.node_to.value
             adjacency_matrix[from_index][to_index] = edg.value
@@ -140,18 +140,30 @@ class Graph(object):
         ARGUMENTS: start_node_num is the starting node number (integer)
         MODIFIES: the value of the visited property of nodes in self.nodes
         RETURN: a list of the node values (integers)."""
-        #self._clear_visited()
+        self._clear_visited()
         start_node = self.find_node(start_node_num)
         return self.dfs_helper(start_node)
 
 
-# Has 5 islands
+# Find islands of given value
+
+value = 1
+'''
+Mat2D = [ [1, 0, 0, 0, 0],
+          [1, 1, 0, 1, 1],
+          [1, 0, 0, 0, 1],
+          [0, 0, 1, 0, 0],
+          [1, 0, 0, 0, 1],
+          [0, 1, 0, 1, 0] ] 
+'''
+
 Mat2D = [ [1, 1, 0, 0, 0],
           [0, 1, 0, 0, 1],
-          [1, 0, 1, 1, 1],
+          [1, 1, 1, 1, 1],
           [1, 0, 0, 0, 1],
           [1, 0, 1, 0, 1],
-          [0, 0, 1, 0, 0] ]                          
+          [0, 0, 1, 0, 0] ] 
+
 
 graph = Graph()
 
@@ -159,34 +171,44 @@ N = len(Mat2D[0])
 M = len(Mat2D)
 
 # populate graph
+evalue = 0
 for i in range(M):
     for j in range(N):
-        if( Mat2D[i][j] == 1 ):
+        if( Mat2D[i][j] == value ):
           graph.insert_node(i*N+j)
-          if( j > 0 and Mat2D[i][j-1] == 1): # horizontal edge
-            graph.insert_edge(Mat2D[i][j], i*N+j-1, i*N+j)
+          if( j > 0 and Mat2D[i][j-1] == value): # horizontal edge
+            graph.insert_edge(evalue, i*N+j-1, i*N+j)
+            evalue += 1
             
-          if( i > 0 and Mat2D[i-1][j] == 1): # top edge
-            graph.insert_edge(Mat2D[i][j], (i-1)*N+j, i*N+j)
+          if( i > 0 and j > 0 and Mat2D[i-1][j-1] == value ): # left diganonal edge
+            graph.insert_edge(evalue, (i-1)*N+j-1, i*N+j)
+            evalue += 1
+
+          if( i > 0 and Mat2D[i-1][j] == value): # top edge
+            graph.insert_edge(evalue, (i-1)*N+j, i*N+j)
+            evalue += 1
             
-          if( i > 0 and j > 0 and Mat2D[i-1][j-1] == 1 ): # left diganonal edge
-            graph.insert_edge(Mat2D[i][j], (i-1)*N+j-1, i*N+j)
-            
-          if( i > 0 and j < N-1 and Mat2D[i-1][j+1] == 1 ): # right diagnonal edge
-            graph.insert_edge(Mat2D[i][j], (i-1)*N+j+1, i*N+j)
+          if( i > 0 and j < N-1 and Mat2D[i-1][j+1] == value ): # right diagnonal edge
+            graph.insert_edge(evalue, (i-1)*N+j+1, i*N+j)
+            evalue += 1
             
 
 # traverse graph to find connected nodes
 cLst = []
 graph._clear_visited()
-for i in range(M):
-  for j in range(N):
-    if( Mat2D[i][j] == 1 ):
-      tLst = graph.dfs( i*N + j )
+for node in graph.nodes:
+    if( not node.visited ):
+      tLst = graph.dfs_helper( node )
       if( tLst ):
         cLst.append(tLst)
-        
-print("Number of islands:", len(cLst))
+
+#Number of islands of value ( 0 ): 3
+#[[2, 3, 4, 8, 7], [5], [16, 17, 18, 23, 28, 29, 21, 25, 26]] 
+
+#Number of islands of value ( 1 ): 2
+#[[0, 1, 6, 10, 11, 12, 13, 9, 14, 19, 24, 15, 20], [22, 27]]
+
+print("Number of islands of value (", value, "):", len(cLst))
 print( cLst )
       
 import pprint
