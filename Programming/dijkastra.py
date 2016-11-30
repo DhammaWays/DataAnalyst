@@ -10,6 +10,10 @@ class Node(object):
         self.value = value
         self.edges = []
         self.visited = False
+        
+    def __lt__(self, other):
+        return self.value < other.value
+
 
 class Edge(object):
     def __init__(self, value, node_from, node_to):
@@ -232,6 +236,7 @@ graph.insert_edge(9471, 5, 2)   # Sao Paolo <-> London
 # for this problem and should produce None in the
 # Adjacency List, etc.
 
+'''
 import pprint
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -259,45 +264,77 @@ pp.pprint(graph.bfs_names(2))
 # Should print:
 # Breadth First Search
 # ['London', 'Shanghai', 'Berlin', 'Sao Paolo', 'Mountain View', 'San Francisco']
+'''
 
 # Dijkastra Algorithm - To dind shortest path from "source" to "target" node
 #
 
-from heapq import heappush, heappop
-import math
-
-s = 0 # source node
-t  = 5 # target node
-
-# populate MinQ
-Q = []
-visitMap = {}
-for node in graph.nodes:
-   if( node.value != s ):
-       heappush(Q, (math.inf, node))
-   else:
-       heappush(Q, (0, node))
-   visitMap[node.value] = False
-       
-distMap, pathMap = {s: 0}, {s: None}
-
-# iterate over picking minimum value node until queue is empty
-while( Q ):
-    d, node = heappop(Q)
-    u = node.value
-    visitMap[u] = True
-    for edge in node.edges:
-        v = edge.node_to.value
-        if( not v in visitMap ):
-            if( edge.value + distMap[u] < d ):
-                Q[v] = edge.value + distMap[u]
-                distMap[v] = edge.value + distMap[u]
-                pathMap[v] = u
-                
-                
+def dijkastra( graph, s, t):
+  '''
+  Returns prdecessor-path and distance dictionary
+  '''
+  from heapq import heappush, heappop, heapify
+  from collections import defaultdict
+  
+  # populate MinQ
+  Q = []
+  visited = set()
+  inf = float('inf')
+  for node in graph.nodes:
+     if( node.value != s ):
+         #print(node.value)
+         heappush(Q, (inf, node))
+     else:
+         heappush(Q, (0, node))
+         
+  distMap, pathMap = defaultdict(lambda: inf), {s: None}
+  distMap[s] = 0
+  
+  # iterate over picking minimum value node until queue is empty
+  while( Q ):
+      d, node = heappop(Q)
+      u = node.value
+      visited.add(u)
+      #print(Q)
+      #print(visited)
+      #print(distMap)
+      #print(pathMap)
+      #print("U =>", u)
+      if( u == t ): # found path to target
+        return pathMap, distMap
         
+      for edge in node.edges:
+          v = edge.node_to.value
+          if( v not in visited ):
+              #print("v:", v)
+              newDist = edge.value + distMap[u]
+              if( newDist < distMap[v] ):
+                  Q[Q.index((distMap[v], edge.node_to))] =  (newDist, edge.node_to)
+                  heapify(Q)
+                  distMap[v] = newDist
+                  pathMap[v] = u
+                  
+  return pathMap, distMap
+                  
+  #print(Q)
+  #print(visited)
+  #print(distMap)
+  #print(pathMap)
+
+s, t =  0, 2
+p, d = dijkastra(graph, s, t)
+path = []
+prev = t
+while prev != s:
+  path.insert(0, prev)
+  prev = p[prev]
+  
+path.insert(0, s)
+
+# Answer:
+# Shortest distance from Mountain View to London is 10113
+# Path: Mountain View - San Francisco - Berlin - London
+
+print("Shortest distance from", graph.node_names[s], "to", graph.node_names[t], "is", d[t])
+print("Path:", ' - '.join([graph.node_names[i] for i in path]))
        
-   
-
-
-
