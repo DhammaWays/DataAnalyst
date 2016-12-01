@@ -47,19 +47,18 @@ class Graph(object):
         self.nodes.append(new_node)
         self._node_map[new_node_val] = new_node
         return new_node
+        
+    def find_insert_node(self, node_val):
+        "Insert a new node with value node_val if it already does not exist"
+        if( node_val not in self._node_map):
+            return self.insert_node(node_val)
+        else:
+            return self._node_map[node_val]        
 
     def insert_edge(self, new_edge_val, node_from_val, node_to_val):
         "Insert a new edge, creating new nodes if necessary"
-        nodes = {node_from_val: None, node_to_val: None}
-        for node in self.nodes:
-            if node.value in nodes:
-                nodes[node.value] = node
-                if all(nodes.values()):
-                    break
-        for node_val in nodes:
-            nodes[node_val] = nodes[node_val] or self.insert_node(node_val)
-        node_from = nodes[node_from_val]
-        node_to = nodes[node_to_val]
+        node_from = self.find_insert_node(node_from_val)
+        node_to = self.find_insert_node(node_to_val)
         new_edge = Edge(new_edge_val, node_from, node_to)
         node_from.edges.append(new_edge)
         node_to.edges.append(new_edge)
