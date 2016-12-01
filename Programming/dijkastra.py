@@ -269,7 +269,7 @@ pp.pprint(graph.bfs_names(2))
 # Dijkastra Algorithm - To dind shortest path from "source" to "target" node
 #
 
-def dijkastra( graph, s, t):
+def dijkastra_1( graph, s, t):
   '''
   Returns prdecessor-path and distance dictionary
   '''
@@ -282,7 +282,6 @@ def dijkastra( graph, s, t):
   inf = float('inf')
   for node in graph.nodes:
      if( node.value != s ):
-         #print(node.value)
          heappush(Q, (inf, node))
      else:
          heappush(Q, (0, node))
@@ -295,10 +294,6 @@ def dijkastra( graph, s, t):
       d, node = heappop(Q)
       u = node.value
       visited.add(u)
-      #print(Q)
-      #print(visited)
-      #print(distMap)
-      #print(pathMap)
       #print("U =>", u)
       if( u == t ): # found path to target
         return pathMap, distMap
@@ -316,25 +311,76 @@ def dijkastra( graph, s, t):
                   
   return pathMap, distMap
                   
-  #print(Q)
-  #print(visited)
-  #print(distMap)
-  #print(pathMap)
+def predecssor_to_path(p, s, t):
+    '''
+    Returns full path from "s" to "t" using given predcessor map 
+    '''
+    path = []
+    prev = t
+    while prev != s:
+      path.insert(0, prev)
+      prev = p[prev]  
+    path.insert(0, s)
+    return path
+                  
+def dijkastra( graph, s, t):
+  '''
+  Returns path and distance dictionary
+  Here we do not have to update existing entries in min heap, so no need to
+  heapify. This should run faster plus we build path as well iteratively
+  instead of just keeping prdecssors around.
+  '''
+  from heapq import heappush, heappop, heapify
+  from collections import defaultdict
+  
+  # populate MinQ
+  Q = [(s, graph.find_node(s), [s])] # node_num, node, path
+  visited = set()
+  inf = float('inf')
+         
+  distMap, pathMap = defaultdict(lambda: inf), {s: [s]}    
+  distMap[s] = 0
+  
+  # iterate over picking minimum value node until queue is empty
+  while( Q ):
+      d, node, path = heappop(Q)
+      u = node.value
+      visited.add(u)
+      #print("U=>", u, path)
+      if( u != path[-1] ):
+          path.append(u)
+      if( u == t ): # found path to target
+        return pathMap, distMap
+        
+      for edge in node.edges:
+          v = edge.node_to.value
+          if( v not in visited ):
+              newDist = edge.value + distMap[u]
+              if( newDist < distMap[v] ):
+                  npath = path + [v]
+                  #print("v:", v, npath)
+                  heappush(Q, (newDist, edge.node_to, npath))
+                  distMap[v] = newDist
+                  pathMap[v] = npath
+                                    
+  return pathMap, distMap
 
+# Test
+                   
+s, t =  0, 2
+p, d = dijkastra_1(graph, s, t)
+path = predecssor_to_path(p, s, t)
+print("Shortest distance from", graph.node_names[s], "to", graph.node_names[t], "is", d[t])
+print("Path:", ' - '.join([graph.node_names[i] for i in path]))
+       
 s, t =  0, 2
 p, d = dijkastra(graph, s, t)
-path = []
-prev = t
-while prev != s:
-  path.insert(0, prev)
-  prev = p[prev]
-  
-path.insert(0, s)
+path = p[t]
+print("Shortest distance from", graph.node_names[s], "to", graph.node_names[t], "is", d[t])
+print("Path:", ' - '.join([graph.node_names[i] for i in path]))
+ 
 
 # Answer:
 # Shortest distance from Mountain View to London is 10113
 # Path: Mountain View - San Francisco - Berlin - London
-
-print("Shortest distance from", graph.node_names[s], "to", graph.node_names[t], "is", d[t])
-print("Path:", ' - '.join([graph.node_names[i] for i in path]))
        
