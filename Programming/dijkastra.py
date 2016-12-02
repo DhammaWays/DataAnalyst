@@ -332,8 +332,14 @@ def dijkastra( graph, s, t):
   from heapq import heappush, heappop, heapify
   from collections import defaultdict
   
+  # Only proceed if the start_node is connected (i.e. not a singelton)!
+  if( s not in graph._node_map):
+      return {s: [s]}, {s: 0}
+  
   # populate MinQ
-  Q = [(s, graph.find_node(s), [s])] # node_num, node, path
+  visited = set()
+  inf = float('inf')
+  Q = [(inf, graph.find_node(s), [s])] # dist, node, path
   visited = set()
   inf = float('inf')
          
@@ -344,23 +350,28 @@ def dijkastra( graph, s, t):
   while( Q ):
       d, node, path = heappop(Q)
       u = node.value
-      visited.add(u)
       #print("U=>", u, path)
-      if( u != path[-1] ):
-          path.append(u)
-      if( u == t ): # found path to target
-        return pathMap, distMap
-        
-      for edge in node.edges:
-          v = edge.node_to.value
-          if( v not in visited ):
-              newDist = edge.value + distMap[u]
-              if( newDist < distMap[v] ):
-                  npath = path + [v]
-                  #print("v:", v, npath)
-                  heappush(Q, (newDist, edge.node_to, npath))
-                  distMap[v] = newDist
-                  pathMap[v] = npath
+      #if( u != path[-1] ):
+      if( u not in visited ):
+          #path.append(u)
+          if( u == t ): # found path to target
+            return pathMap, distMap
+            
+          for edge in node.edges:
+              v = edge.node_to.value
+              node = edge.node_to
+              if( v == u ): # to handle undirected edges
+                  v = edge.node_from.value
+                  node = edge.node_from
+              if( v not in visited ):
+                  newDist = edge.value + distMap[u]
+                  if( newDist < distMap[v] ):
+                      npath = path + [v]
+                      #print("v:", v, npath)
+                      heappush(Q, (newDist, node, npath))
+                      distMap[v] = newDist
+                  pathMap[v] = npath                 
+          visited.add(u)
                                     
   return pathMap, distMap
 
