@@ -21,13 +21,6 @@ class Edge(object):
         self.node_from = node_from
         self.node_to = node_to
 
-# You only need to change code with docs strings that have TODO.
-# Specifically: Graph.dfs_helper and Graph.bfs
-# New methods have been added to associate node numbers with names
-# Specifically: Graph.set_node_names
-# and the methods ending in "_names" which will print names instead
-# of node numbers
-
 class Graph(object):
     def __init__(self, nodes=None, edges=None):
         self.nodes = nodes or []
@@ -201,196 +194,300 @@ class Graph(object):
     def bfs_names(self, start_node_num):
         """Return the results of bfs with numbers converted to names."""
         return [self.node_names[num] for num in self.bfs(start_node_num)]
-
-graph = Graph()
-
-# You do not need to change anything below this line.
-# You only need to implement Graph.dfs_helper and Graph.bfs
-
-graph.set_node_names(('Mountain View',   # 0
-                      'San Francisco',   # 1
-                      'London',          # 2
-                      'Shanghai',        # 3
-                      'Berlin',          # 4
-                      'Sao Paolo',       # 5
-                      'Bangalore'))      # 6 
-
-graph.insert_edge(51, 0, 1)     # MV <-> SF
-graph.insert_edge(51, 1, 0)     # SF <-> MV
-graph.insert_edge(9950, 0, 3)   # MV <-> Shanghai
-graph.insert_edge(9950, 3, 0)   # Shanghai <-> MV
-graph.insert_edge(10375, 0, 5)  # MV <-> Sao Paolo
-graph.insert_edge(10375, 5, 0)  # Sao Paolo <-> MV
-graph.insert_edge(9900, 1, 3)   # SF <-> Shanghai
-graph.insert_edge(9900, 3, 1)   # Shanghai <-> SF
-graph.insert_edge(9130, 1, 4)   # SF <-> Berlin
-graph.insert_edge(9130, 4, 1)   # Berlin <-> SF
-graph.insert_edge(9217, 2, 3)   # London <-> Shanghai
-graph.insert_edge(9217, 3, 2)   # Shanghai <-> London
-graph.insert_edge(932, 2, 4)    # London <-> Berlin
-graph.insert_edge(932, 4, 2)    # Berlin <-> London
-graph.insert_edge(9471, 2, 5)   # London <-> Sao Paolo
-graph.insert_edge(9471, 5, 2)   # Sao Paolo <-> London
-# (6) 'Bangalore' is intentionally disconnected (no edges)
-# for this problem and should produce None in the
-# Adjacency List, etc.
-
-'''
-import pprint
-pp = pprint.PrettyPrinter(indent=2)
-
-print "Edge List"
-pp.pprint(graph.get_edge_list_names())
-
-print "\nAdjacency List"
-pp.pprint(graph.get_adjacency_list_names())
-
-print "\nAdjacency Matrix"
-pp.pprint(graph.get_adjacency_matrix())
-
-print "\nDepth First Search"
-pp.pprint(graph.dfs_names(2))
-
-# Should print:
-# Depth First Search
-# ['London', 'Shanghai', 'Mountain View', 'San Francisco', 'Berlin', 'Sao Paolo']
-
-print "\nBreadth First Search"
-pp.pprint(graph.bfs_names(2))
-# test error reporting
-# pp.pprint(['Sao Paolo', 'Mountain View', 'San Francisco', 'London', 'Shanghai', 'Berlin'])
-
-# Should print:
-# Breadth First Search
-# ['London', 'Shanghai', 'Berlin', 'Sao Paolo', 'Mountain View', 'San Francisco']
-'''
-
-# Dijkastra Algorithm - To dind shortest path from "source" to "target" node
-#
-
-def dijkastra_1( graph, s, t):
-  '''
-  Returns prdecessor-path and distance dictionary
-  '''
-  from heapq import heappush, heappop, heapify
-  from collections import defaultdict
-  
-  # populate MinQ
-  Q = []
-  visited = set()
-  inf = float('inf')
-  for node in graph.nodes:
-     if( node.value != s ):
-         heappush(Q, (inf, node))
-     else:
-         heappush(Q, (0, node))
-         
-  distMap, pathMap = defaultdict(lambda: inf), {s: None}
-  distMap[s] = 0
-  
-  # iterate over picking minimum value node until queue is empty
-  while( Q ):
-      d, node = heappop(Q)
-      u = node.value
-      visited.add(u)
-      #print("U =>", u)
-      if( u == t ): # found path to target
-        return pathMap, distMap
         
-      for edge in node.edges:
-          v = edge.node_to.value
-          if( v not in visited ):
-              #print("v:", v)
-              newDist = edge.value + distMap[u]
-              if( newDist < distMap[v] ):
-                  Q[Q.index((distMap[v], edge.node_to))] =  (newDist, edge.node_to)
-                  heapify(Q)
-                  distMap[v] = newDist
-                  pathMap[v] = u
-                  
-  return pathMap, distMap
-                  
-def predecssor_to_path(p, s, t):
-    '''
-    Returns full path from "s" to "t" using given predcessor map 
-    '''
-    path = []
-    prev = t
-    while prev != s:
-      path.insert(0, prev)
-      prev = p[prev]  
-    path.insert(0, s)
-    return path
-                  
-def dijkastra( graph, s, t):
-  '''
-  Returns path and distance dictionary
-  Here we do not have to update existing entries in min heap, so no need to
-  heapify. This should run faster plus we build path as well iteratively
-  instead of just keeping prdecssors around.
-  '''
-  from heapq import heappush, heappop, heapify
-  from collections import defaultdict
-  
-  # Only proceed if the start_node is connected (i.e. not a singelton)!
-  if( s not in graph._node_map):
-      return {s: [s]}, {s: 0}
-  
-  # populate MinQ
-  visited = set()
-  inf = float('inf')
-  Q = [(inf, graph.find_node(s), [s])] # dist, node, path
-  visited = set()
-  inf = float('inf')
-         
-  distMap, pathMap = defaultdict(lambda: inf), {s: [s]}    
-  distMap[s] = 0
-  
-  # iterate over picking minimum value node until queue is empty
-  while( Q ):
-      d, node, path = heappop(Q)
-      u = node.value
-      #print("U=>", u, path)
-      #if( u != path[-1] ):
-      if( u not in visited ):
-          #path.append(u)
+    # Dijkastra Algorithm - To dind shortest path from "source" to "target" node
+    #
+    
+    def dijkastra_1(self, s, t):
+      '''
+      Returns prdecessor-path and distance dictionary
+      '''
+      from heapq import heappush, heappop, heapify
+      from collections import defaultdict
+      
+      # Only proceed if the start_node is connected (i.e. not a singelton)!
+      if( s not in self._node_map):
+          return {s: [None]}, {s: 0}
+      
+      # populate MinQ
+      Q = []
+      visited = set()
+      inf = float('inf')
+      for node in self.nodes:
+         if( node.value != s ):
+             heappush(Q, (inf, node))
+         else:
+             heappush(Q, (0, node))
+             
+      distMap, pathMap = defaultdict(lambda: inf), {s: None}
+      distMap[s] = 0
+      
+      # iterate over picking minimum value node until queue is empty
+      while( Q ):
+          d, node = heappop(Q)
+          u = node.value
+          visited.add(u)
+          #print("U =>", u)
           if( u == t ): # found path to target
             return pathMap, distMap
             
           for edge in node.edges:
               v = edge.node_to.value
-              node = edge.node_to
-              if( v == u ): # to handle undirected edges
-                  v = edge.node_from.value
-                  node = edge.node_from
               if( v not in visited ):
+                  #print("v:", v)
                   newDist = edge.value + distMap[u]
                   if( newDist < distMap[v] ):
-                      npath = path + [v]
-                      #print("v:", v, npath)
-                      heappush(Q, (newDist, node, npath))
+                      Q[Q.index((distMap[v], edge.node_to))] =  (newDist, edge.node_to)
+                      heapify(Q)
                       distMap[v] = newDist
-                  pathMap[v] = npath                 
-          visited.add(u)
-                                    
-  return pathMap, distMap
+                      pathMap[v] = u
+                      
+      return pathMap, distMap
+                      
+    def predecessor_to_path(self, p, s, t):
+        '''
+        Returns full path from "s" to "t" using given predcessor map 
+        '''
+        path = []
+        prev = t
+        while prev != s:
+          path.insert(0, prev)
+          prev = p[prev]
+          
+        path.insert(0, s)
+        return path
+                      
+    def dijkastra( self, s, t):
+      '''
+      Returns path and distance dictionary
+      Here we do not have to update existing entries in min heap, so no need to
+      heapify. This should run faster plus we build path as well iteratively
+      instead of just keeping prdecssors around.
+      '''
+      from heapq import heappush, heappop, heapify
+      from collections import defaultdict
+      
+      # Only proceed if the start_node is connected (i.e. not a singelton)!
+      if( s not in self._node_map):
+          return {s: [s]}, {s: 0}
+      
+      # populate MinQ
+      visited = set()
+      inf = float('inf')
+      Q = [(inf, self.find_node(s), [s])] # dist, node, path
+      visited = set()
+      inf = float('inf')
+             
+      distMap, pathMap = defaultdict(lambda: inf), {s: [s]}    
+      distMap[s] = 0
+      
+      # iterate over picking minimum value node until queue is empty
+      while( Q ):
+          d, node, path = heappop(Q)
+          u = node.value
+          #print("U=>", u, path)
+          #if( u != path[-1] ):
+          if( u not in visited ):
+              #path.append(u)
+              if( u == t ): # found path to target
+                return pathMap, distMap
+                
+              for edge in node.edges:
+                  v = edge.node_to.value
+                  node = edge.node_to
+                  if( v == u ): # to handle undirected edges
+                      v = edge.node_from.value
+                      node = edge.node_from
+                  if( v not in visited ):
+                      newDist = edge.value + distMap[u]
+                      if( newDist < distMap[v] ):
+                          npath = path + [v]
+                          #print("v:", v, npath)
+                          heappush(Q, (newDist, node, npath))
+                          distMap[v] = newDist
+                          pathMap[v] = npath                 
+              visited.add(u)
+                                        
+      return pathMap, distMap
+  
+    def kruskalMST(self, s):
+        '''
+        Minimum Spanning Tree (Kruskal: In case of equal edge weight choose with minimum sum of two node numbers connecting this edge)
+        Returns predecessor node of minimum spanning tree path to a node and dist from prdecessor dictionary
+        '''
+        from heapq import heappush, heappop, heapify
+        from collections import defaultdict
 
-# Test
-                   
-s, t =  0, 2
-p, d = dijkastra_1(graph, s, t)
-path = predecssor_to_path(p, s, t)
-print("Shortest distance from", graph.node_names[s], "to", graph.node_names[t], "is", d[t])
-print("Path:", ' - '.join([graph.node_names[i] for i in path]))
-       
-s, t =  0, 2
-p, d = dijkastra(graph, s, t)
-path = p[t]
-print("Shortest distance from", graph.node_names[s], "to", graph.node_names[t], "is", d[t])
-print("Path:", ' - '.join([graph.node_names[i] for i in path]))
- 
+        if( s not in self._node_map ): # when start node is not connected, singleton!
+            return {s: [None]}, {s: 0}
+        
+        # populate MinQ
+        Q = [(0, s, None)] # span, node_num, connecting edge node_num
+        visited = set()
+        inf = float('inf')
 
-# Answer:
-# Shortest distance from Mountain View to London is 10113
-# Path: Mountain View - San Francisco - Berlin - London
+        distMap = defaultdict(lambda: inf)    
+        distMap[s] = 0
+        pathMap = {s : None}
+
+        # iterate over picking minimum value node until queue is empty
+        while( Q ):
+            d, u, up = heappop(Q)
+            #print("U=>", u, d)
+            if( u not in visited ):
+                for edge in self.find_node(u).edges:
+                    v = edge.node_to.value
+                    if( u == v ): # non-directed
+                        v = edge.node_from.value
+
+                    if( v not in visited ):
+                        newDist = edge.value
+                        if( newDist <= distMap[v] ):
+                            #print("v:", v, newDist)
+                            heappush(Q, (newDist, v, u))
+                            distMap[v] = newDist
+                            pathMap[v] = u
+                            
+                visited.add(u)
+
+        return pathMap, distMap
+
+
+    def primMST(self, s):
+        '''
+        Minimum Spanning Tree (Prim's: Selec the edges with minimum weight)
+        Returns predecessor node of minimum spanning tree path to a node and dist from prdecessor dictionary
+        '''
+        from heapq import heappush, heappop, heapify
+        from collections import defaultdict
+
+        if( s not in self._node_map ): # when start node is not connected, singleton!
+            return {s: 0}
+        
+        # populate MinQ
+        Q = [(0, s)] # span, node_num
+        visited = set()
+        inf = float('inf')
+
+        distMap = defaultdict(lambda: inf)    
+        distMap[s] = 0
+        pathMap = {s : None}
+
+        # iterate over picking minimum value node until queue is empty
+        while( Q ):
+            d, u = heappop(Q)
+            #print("U=>", u, d)
+            if( u not in visited ):
+                for edge in self.find_node(u).edges:
+                    v = edge.node_to.value
+                    if( u == v ): # non-directed
+                        v = edge.node_from.value
+
+                    if( v not in visited ):
+                        newDist = edge.value
+                        if( newDist < distMap[v] ):
+                            #print("v:", v, newDist)
+                            heappush(Q, (newDist, v))
+                            distMap[v] = newDist
+                            pathMap[v] = u
+                            
+                visited.add(u)
+
+        return pathMap, distMap
+
+# Test Code
+
+# Only execute test code if called from main (i.e. not when it is imported as module)        
+if __name__ == "__main__":
+    
+    graph = Graph()
+    
+    # You do not need to change anything below this line.
+    # You only need to implement Graph.dfs_helper and Graph.bfs
+    
+    graph.set_node_names(('Mountain View',   # 0
+                          'San Francisco',   # 1
+                          'London',          # 2
+                          'Shanghai',        # 3
+                          'Berlin',          # 4
+                          'Sao Paolo',       # 5
+                          'Bangalore'))      # 6 
+    
+    graph.insert_edge(51, 0, 1)     # MV <-> SF
+    graph.insert_edge(51, 1, 0)     # SF <-> MV
+    graph.insert_edge(9950, 0, 3)   # MV <-> Shanghai
+    graph.insert_edge(9950, 3, 0)   # Shanghai <-> MV
+    graph.insert_edge(10375, 0, 5)  # MV <-> Sao Paolo
+    graph.insert_edge(10375, 5, 0)  # Sao Paolo <-> MV
+    graph.insert_edge(9900, 1, 3)   # SF <-> Shanghai
+    graph.insert_edge(9900, 3, 1)   # Shanghai <-> SF
+    graph.insert_edge(9130, 1, 4)   # SF <-> Berlin
+    graph.insert_edge(9130, 4, 1)   # Berlin <-> SF
+    graph.insert_edge(9217, 2, 3)   # London <-> Shanghai
+    graph.insert_edge(9217, 3, 2)   # Shanghai <-> London
+    graph.insert_edge(932, 2, 4)    # London <-> Berlin
+    graph.insert_edge(932, 4, 2)    # Berlin <-> London
+    graph.insert_edge(9471, 2, 5)   # London <-> Sao Paolo
+    graph.insert_edge(9471, 5, 2)   # Sao Paolo <-> London
+    # (6) 'Bangalore' is intentionally disconnected (no edges)
+    # for this problem and should produce None in the
+    # Adjacency List, etc.
+    
+    '''
+    import pprint
+    pp = pprint.PrettyPrinter(indent=2)
+    
+    print "Edge List"
+    pp.pprint(graph.get_edge_list_names())
+    
+    print "\nAdjacency List"
+    pp.pprint(graph.get_adjacency_list_names())
+    
+    print "\nAdjacency Matrix"
+    pp.pprint(graph.get_adjacency_matrix())
+    
+    print "\nDepth First Search"
+    pp.pprint(graph.dfs_names(2))
+    
+    # Should print:
+    # Depth First Search
+    # ['London', 'Shanghai', 'Mountain View', 'San Francisco', 'Berlin', 'Sao Paolo']
+    
+    print "\nBreadth First Search"
+    pp.pprint(graph.bfs_names(2))
+    # test error reporting
+    # pp.pprint(['Sao Paolo', 'Mountain View', 'San Francisco', 'London', 'Shanghai', 'Berlin'])
+    
+    # Should print:
+    # Breadth First Search
+    # ['London', 'Shanghai', 'Berlin', 'Sao Paolo', 'Mountain View', 'San Francisco']
+    '''
+    
+    
+    # Test
+                       
+    s, t =  0, 2
+    p, d = graph.dijkastra_1(s, t)
+    path = graph.predecessor_to_path(p, s, t)
+    print("Shortest distance from", graph.node_names[s], "to", graph.node_names[t], "is", d[t])
+    print("Path:", ' - '.join([graph.node_names[i] for i in path]))
+           
+    s, t =  0, 2
+    p, d = graph.dijkastra(s, t)
+    path = p[t]
+    print("Shortest distance from", graph.node_names[s], "to", graph.node_names[t], "is", d[t])
+    print("Path:", ' - '.join([graph.node_names[i] for i in path]))
+     
+    p, d = graph.kruskalMST(s)
+    path = graph.predecessor_to_path(p, s, t)
+    print("Kruskal MST Path:", ' - '.join([graph.node_names[i] for i in path]))
+    
+    p, d = graph.primMST(s)
+    path = graph.predecessor_to_path(p, s, t)
+    print("Prim MST Path:", ' - '.join([graph.node_names[i] for i in path]))
+    
+    
+    # Answer:
+    # Shortest distance from Mountain View to London is 10113
+    # Path: Mountain View - San Francisco - Berlin - London
        
