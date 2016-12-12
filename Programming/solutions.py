@@ -144,6 +144,11 @@ def question4(T, r, n1, n2):
     """
     pass
 
+class Node(object):
+  def __init__(self, data):
+    self.data = data
+    self.next = None
+
 def question5(ll, m):
     """
     Find the element in a singly linked list that's m elements from the end.
@@ -156,7 +161,25 @@ def question5(ll, m):
     MODIFIES: None
     RETURN: "m" element (Node) from end
     """
-    pass
+    # Trivial case
+    if( not ll or m < 0 ):
+      return None
+      
+    nxtNode = ll
+    prevNode = ll
+    count = 0
+    while( nxtNode is not None ):
+      if( count > m ):
+        prevNode = prevNode.next
+      
+      count += 1  
+      nxtNode = nxtNode.next
+        
+    if( count <= m ):
+      return None
+    else:
+      return prevNode
+
 
 
 # Test Code
@@ -188,8 +211,21 @@ if __name__ == "__main__":
     G = {'A': [('B', 2), ('C', 3), ('D', 2)], 'B': [('A', 2), ('D', 1)], 'C': [('A', 3), ('D', 2)],
          'D': [('C', 2), ('B', 1), ('E', 1)], 'E': [('D', 1)]}
     print(question3(G))
+      
+    ll = Node(1)
+    node = ll
+    for i in range(2, 12):
+      node.next = Node(i)
+      node = node.next
     
-    
+    print(question5(ll, 1).data)
+    print(question5(ll, 5).data)
+    print(question5(ll, 10).data)
+    print(question5(ll, 0).data)
+    print(question5(ll, 11))
+    print(question5(None, 2))
+    print(question5(ll, -2))
+        
     
 
     
