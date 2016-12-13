@@ -130,6 +130,27 @@ def question3(G):
     
     return mstG
 
+# Binary Tree node 
+class tNode(object):
+  def __init__(self, data):
+    self.data = data 
+    self.left = None
+    self.right = None
+
+# Build a binary search Tree
+def buildBST(T, r):
+  node = tNode(r)
+  for i in range(len(T[r])):
+    if( T[r][i] == 1 ):
+      if( i < r ):
+        node.left = buildBST(T, i)
+      else:
+        node.right = buildBST(T, i)
+        break
+        
+  return node
+        
+  
 def question4(T, r, n1, n2):
     """
     Find the least common ancestor between two nodes on a binary search tree.
@@ -142,7 +163,27 @@ def question4(T, r, n1, n2):
     MODIFIES: None
     RETURN: Least common ancestor node
     """
-    pass
+    # Trivial case
+    if( r == n1 or r == n2 ):
+      return None
+    elif( n1 < r < n2 ):
+      return r
+      
+    # Build the BST 
+    root = buildBST(T, r)
+    
+    # Find the root node whose value is between given n1 and n2
+    while(root is not None):
+      if( (n1 < root.data < n2) or (n2 < root.data < n1) ):
+        return root.data
+      
+      # Keep seraching to left or right of tree based on which side our value lies  
+      if( n1 < root.data ):
+        root = root.left
+      else:
+        root = root.right
+        
+    return None 
 
 class Node(object):
   def __init__(self, data):
@@ -226,6 +267,20 @@ if __name__ == "__main__":
     print(question5(None, 2))
     print(question5(ll, -2))
         
+    T = [[0, 1, 0, 0, 0],
+         [0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0],
+         [1, 0, 0, 0, 1],
+         [0, 0, 0, 0, 0]]
+    print(question4(T, 3, 1, 4))
+    T = [[0, 0, 0, 0, 0],
+         [1, 0, 1, 0, 0],
+         [0, 0, 0, 0, 0],
+         [0, 1, 0, 0, 1],
+         [0, 0, 0, 0, 0]]
+    print(question4(T, 3, 0, 4))
+    print(question4(T, 3, 0, 2))
+    print(question4(T, 3, 1, 2))
     
 
     
