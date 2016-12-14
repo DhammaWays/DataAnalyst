@@ -38,7 +38,7 @@ def question1(s, t):
     return foundAnagram
         
     
-def question2(a):
+def question2_0(a):
     """
     Given a string "a", returns the longest palindromic substring contained in "a"
     ARGUMENTS: String "a" for which longest palindromic substring is to be extracted
@@ -66,6 +66,73 @@ def question2(a):
             
     # no match found just return first character as palindrome of 1 char        
     return a[0]      
+
+# merge two palindrome strings of equal length
+def merge_pal(a, i1, j1, i2, j2):
+    len1 = j1-i1 + 1
+    len2 = j2-i2 + 1
+    if( a[j1] != a[i2] ): # can not be directly merged
+        if( len1 >= len2): # first is bigger
+            return (i1, j1)
+        else:
+            return (i2, j2)
+    else:
+        # Findout how much reverse of second string match with first string from end
+        mismatch = False
+        for i, j in zip(range(j1, i1-1, -1), range(i2, len2)):
+            if( a[i] != a[j] ):
+                mismatch = True
+                break
+        if( mismatch )
+            return (i+1, j-1)
+        else: # reverse of whole string matched, so it canbe completely combined
+            return (i1, j2)
+
+def question2_helper(a, i, j):
+    isPal = False
+    palStr = ""
+    
+    # trivial case
+    size = j-i + 1
+    if( size <= 1 ):
+        return(True, i, j)
+    elif( size <= 3 and a[i] == a[j] ):
+        return(True, i, j)
+ 
+    # Recursively subdivide
+    if( size & 1 ): # odd length string
+        isPal1, i1, j1 = question2_helper(a, 0, size//2 + 1)
+        isPal2, i2, j2 = question2_helper(a, size//2, size-1)
+    else:
+        isPal1, i1, j1 = question2_helper(a, 0, size//2 - 1)
+        isPal2, i2, j2 = question2_helper(a, size//2, size-1)
+        
+    if( isPal1 and isPal2 ) 
+        return (True, *merge_pal(a, i1, j1, i2, j2)
+    elif( isPal1 ):
+        return (True, i1, j1)
+    elif( isPal2 ):
+        return (True, i2, j2)
+    else:
+        isPal1, i1, j1 = question2_helper(a,i1, j1)
+        isPal2, i2, j2 = question2_helper(a,i2, j2)
+        //merge them
+
+    
+    return (isPal, palStr)
+
+def question2(a):
+    """
+    Given a string "a", returns the longest palindromic substring contained in "a"
+    ARGUMENTS: String "a" for which longest palindromic substring is to be extracted
+    MODIFIES: None
+    RETURN: Longest palindromic substring in string "a"
+    """
+
+        
+    
+        
+
 
 def primMST(G, s):
     '''
