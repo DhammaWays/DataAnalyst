@@ -67,7 +67,18 @@ def question2_0(a):
     # no match found just return first character as palindrome of 1 char        
     return a[0]      
 
-# merge two palindrome strings of equal length
+
+# check how much of reverse of second string match with first string from its end
+def matchReverse(a, i1, j1, i2, j2):
+    match = True
+    for i, j in zip(range(j1, i1-1, -1), range(i2, j2+1)):
+        if( a[i] != a[j] ):
+            match = False
+            break
+
+    return (match, i+1, j-1)  
+
+# merge two palindrome strings
 def merge_pal(a, i1, j1, i2, j2):
     len1 = j1-i1 + 1
     len2 = j2-i2 + 1
@@ -78,48 +89,107 @@ def merge_pal(a, i1, j1, i2, j2):
             return (i2, j2)
     else:
         # Findout how much reverse of second string match with first string from end
-        mismatch = False
-        for i, j in zip(range(j1, i1-1, -1), range(i2, len2)):
-            if( a[i] != a[j] ):
-                mismatch = True
-                break
-        if( mismatch )
-            return (i+1, j-1)
-        else: # reverse of whole string matched, so it canbe completely combined
+        match, _, _ = matchReverse(a, i1, j1, i2, j2)
+        if( not match ):
+          if( len1 >= len2 ):
+            return (i1, j1) # just return first string
+          else:
+            return (i2, j2)
+        else: # reverse of whole string matched, so it can be completely combined
             return (i1, j2)
 
 def question2_helper(a, i, j):
-    isPal = False
-    palStr = ""
-    
     # trivial case
     size = j-i + 1
     if( size <= 1 ):
-        return(True, i, j)
-    elif( size <= 3 and a[i] == a[j] ):
-        return(True, i, j)
+      return (True, i, i)
+    elif( size == 2 ):
+      return (a[i] == a[j], i, j)
+    elif( size == 3 ):
+      if( a[i] == a[j] ):
+        return (True, i, j)
+      elif( a[i] == a[i+1] ):
+        return (True, i, i+1)
+      elif( a[i+1] == a[j] ):
+        return (True, i+1, j)
+      else:
+        return (False, i, j)
  
     # Recursively subdivide
     if( size & 1 ): # odd length string
-        isPal1, i1, j1 = question2_helper(a, 0, size//2 + 1)
-        isPal2, i2, j2 = question2_helper(a, size//2, size-1)
+        i1, j1, i2, j2 = i, i+(size//2), i+(size//2), j
     else:
-        isPal1, i1, j1 = question2_helper(a, 0, size//2 - 1)
-        isPal2, i2, j2 = question2_helper(a, size//2, size-1)
+        i1, j1, i2, j2 = i, i+(size//2) - 1, i+(size//2), j
         
-    if( isPal1 and isPal2 ) 
-        return (True, *merge_pal(a, i1, j1, i2, j2)
-    elif( isPal1 ):
-        return (True, i1, j1)
-    elif( isPal2 ):
-        return (True, i2, j2)
+    match, _, _ = matchReverse(a, i1, j1, i2, j2)
+    if( match ):
+        return (True, i, j)
     else:
-        isPal1, i1, j1 = question2_helper(a,i1, j1)
-        isPal2, i2, j2 = question2_helper(a,i2, j2)
-        //merge them
-
+        isPal1, i1, j1 = question2_helper(a, i1, j1)
+        isPal2, i2, j2 = question2_helper(a, i2, j2)
     
-    return (isPal, palStr)
+    len1 = j1-i1 + 1
+    len2 = j2-i2 + 1
+    if( isPal1 and isPal2 ):
+        return (True, *merge_pal(a, i1, j1, i2, j2))
+    elif( isPal1 ):
+        match, i3, j3 = matchReverse(a, i1, j1, i2, j2)
+        #print(match, i3, j3, i1, j1, i2, j2, len1, len2)
+        if( not match ): # expected
+          if( j3-i3+1 > len1 ):
+            return (True, i3, j3)
+          else:
+            return (True, i1, j1)
+        else:
+          return (True, i1, j2)
+    elif( isPal2 ):
+        match, i3, j3 = matchReverse(a, i1, j1, i2, j2)
+        if( not match ): # expected
+          if( j3-i3+1 > len2 ):
+            return (True, i3, j3)
+          else:
+            return (True, i2, j2)
+        else:
+          return (True, i1, j2)
+    else:
+        match, i3, j3 = matchReverse(a, i1, j1, i2, j2)
+        if( match ):
+          return (True, i1, j2)
+        else:
+          len3 = j3-i3+1
+          if( len3 >= len1 ):
+            return (True, i3, j3)
+          else: # find pal string within remaining two first and second halfs
+            isPal4, i4, j4 = question2_helper(a, i1, i3-1)
+            isPal5, i5, j5 = question2_helper(a, j3+1, j2)
+            if( isPal4 and isPal5 ):
+              len4 = j4-i4+1
+              len5 = j5-i5+1
+              # return maximum of three
+              if( len3 >= len4 ):
+                if( len3 >= len5 ):
+                  return (True, i3, j3)
+                else:
+                  return (True, i5, j5)
+              elif( len4 >= len5 ):
+                  return (True, i4, j4)
+              else:
+                  return (True, i5, j5)
+            elif( isPal4 ):
+              if( len3 >= j4-i4+1 ):
+                return (True, i3, j3)
+              else:
+                return (True, i4, j4)
+            elif( isPal5 ):
+              if( len3 >= j5-i5+1 ):
+                return (True, i3, j3)
+              else:
+                return (True, i5, j5)
+            else: # return middle pal
+                return (True, i3, j3)
+              
+    # Fallback, no real palindrome found!
+    return (False, i, j)
 
 def question2(a):
     """
@@ -129,11 +199,13 @@ def question2(a):
     RETURN: Longest palindromic substring in string "a"
     """
 
-        
+    isPal, i, j = question2_helper(a, 0, len(a)-1)
+    if( isPal ):
+      return a[i:j+1]
+    else:
+      return "OOPS! Something went Wrong!"
+       
     
-        
-
-
 def primMST(G, s):
     '''
     Minimum Spanning Tree (Prim's: Select the edges with minimum weight)
