@@ -191,7 +191,7 @@ def question2_helper(a, i, j):
     # Fallback, no real palindrome found!
     return (False, i, j)
 
-def question2(a):
+def question2_1(a):
     """
     Given a string "a", returns the longest palindromic substring contained in "a"
     ARGUMENTS: String "a" for which longest palindromic substring is to be extracted
@@ -204,7 +204,41 @@ def question2(a):
       return a[i:j+1]
     else:
       return "OOPS! Something went Wrong!"
-       
+
+
+def matchCenter(s, n, i1, i2):
+    matchWhole = True
+    for i, j in zip(range(i1, -1, -1), range(i2, n)):
+        if( s[i] != s[j] ):
+            matchWhole = False
+            break
+          
+    if( matchWhole ):
+      return (i, j)
+    else:
+      return (i+1, j-1)
+
+def lenStr( curIdx ):
+  return (curIdx[1]-curIdx[0]+1)
+  
+def question2(a):
+  size = len(a)
+  if( size == 0 ):
+    return ""
+    
+  maxStr = (0, 0)
+  for i in range(0, size-1):
+    curStr = matchCenter(a, size, i, i)
+    if( lenStr(curStr) > lenStr(maxStr) ):
+      maxStr = curStr
+      
+    curStr = matchCenter(a, size, i, i+1)
+    if( lenStr(curStr) > lenStr(maxStr) ):
+      maxStr = curStr
+      
+  return a[maxStr[0]:maxStr[1]+1]
+
+
     
 def primMST(G, s):
     '''
