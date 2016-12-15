@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Dec 12 15:52:38 2016
-
-@author: lsharma
-"""
 
 """
 Technical Interview Questions
@@ -12,7 +7,7 @@ Lekhraj Sharma
 Dec 2016
 """
 
-def question1(s, t):
+def question1_0(s, t):
     """
     Given two strings "s" and "t", checks whether some anagram of "t" is a substring of "s"
     ASSUMPTION: Matches are case specific. Empty "t" matches.
@@ -37,6 +32,47 @@ def question1(s, t):
         
     return foundAnagram
         
+def question1(s, t):
+    """
+    Given two strings "s" and "t", checks whether some anagram of "t" is a substring of "s"
+    ASSUMPTION: Matches are case specific. Empty "t" matches.
+    ARGUMENTS: String "s" for which existense of an anagram of String "t" is checked
+    MODIFIES: None
+    RETURN: True if an anagram of "t" is present in "s", otherwise returns False
+    """
+    
+    # Basic cases: Empty strings or anagram string being larger length
+    lenT = len(t)
+    lenS = len(s)
+    if( lenT == 0 ):
+        return True
+    elif( lenT > lenS ):
+        return False
+
+    # Counter are handy for comparing count of characters in a string
+    from collections import Counter   
+    cntT = Counter(t)
+    cntS = Counter(s[0:lenT])
+    foundAnagram = False
+    
+    # Keep comparing sliding window of length of "t" by advancing it 1 char at a time
+    for i in range(lenT, lenS):
+        # We have found our anagram (at index of i-lenT) if curremt window has
+        # same set of characters with same count (frequency) as our pattern "t". 
+        if( cntT == cntS ):
+            foundAnagram = True
+            break
+        
+        # Keep advancing our window by 1 character
+        # Add current character and remove first character from last window
+        cntS += Counter(s[i])
+        cntS -= Counter(s[i-lenT])
+    
+    # If we have not found an anagram already, need to check for last remaining window
+    if( foundAnagram ):    
+        return True
+    else:
+        return cntT == cntS 
     
 def question2_0(a):
     """
@@ -50,162 +86,28 @@ def question2_0(a):
         return(a)
         
     import re
-        
+    
+    # Build regular expression to find palindrome of n*2 length
+    # For example for string length of 6(even) or 7(odd) it Looks like:
+    #  (.+)(.+)(.+).?\3\2\1
     def rePalExp(n):
         reExp = "(.+)"*n + ".?"
         for i in range(n, 0, -1):
             reExp += "\\" + str(i)
         return reExp
     
+    # Keep checking for palindrome from largest possible to samllest possible
+    # We exit as soon as we find the first palindrome 
     maxLen = len(a) // 2
     for i in range(maxLen, 0, -1):
-        #print(rePalExp(i))
         m = re.search(rePalExp(i), a)
         if( m ):
             return m.group(0)
             
-    # no match found just return first character as palindrome of 1 char        
+    # No match found just return first character as palindrome of 1 char        
     return a[0]      
 
-
-# check how much of reverse of second string match with first string from its end
-def matchReverse(a, i1, j1, i2, j2):
-    match = True
-    for i, j in zip(range(j1, i1-1, -1), range(i2, j2+1)):
-        if( a[i] != a[j] ):
-            match = False
-            break
-
-    return (match, i+1, j-1)  
-
-# merge two palindrome strings
-def merge_pal(a, i1, j1, i2, j2):
-    len1 = j1-i1 + 1
-    len2 = j2-i2 + 1
-    if( a[j1] != a[i2] ): # can not be directly merged
-        if( len1 >= len2): # first is bigger
-            return (i1, j1)
-        else:
-            return (i2, j2)
-    else:
-        # Findout how much reverse of second string match with first string from end
-        match, _, _ = matchReverse(a, i1, j1, i2, j2)
-        if( not match ):
-          if( len1 >= len2 ):
-            return (i1, j1) # just return first string
-          else:
-            return (i2, j2)
-        else: # reverse of whole string matched, so it can be completely combined
-            return (i1, j2)
-
-def question2_helper(a, i, j):
-    # trivial case
-    size = j-i + 1
-    if( size <= 1 ):
-      return (True, i, i)
-    elif( size == 2 ):
-      return (a[i] == a[j], i, j)
-    elif( size == 3 ):
-      if( a[i] == a[j] ):
-        return (True, i, j)
-      elif( a[i] == a[i+1] ):
-        return (True, i, i+1)
-      elif( a[i+1] == a[j] ):
-        return (True, i+1, j)
-      else:
-        return (False, i, j)
- 
-    # Recursively subdivide
-    if( size & 1 ): # odd length string
-        i1, j1, i2, j2 = i, i+(size//2), i+(size//2), j
-    else:
-        i1, j1, i2, j2 = i, i+(size//2) - 1, i+(size//2), j
-        
-    match, _, _ = matchReverse(a, i1, j1, i2, j2)
-    if( match ):
-        return (True, i, j)
-    else:
-        isPal1, i1, j1 = question2_helper(a, i1, j1)
-        isPal2, i2, j2 = question2_helper(a, i2, j2)
-    
-    len1 = j1-i1 + 1
-    len2 = j2-i2 + 1
-    if( isPal1 and isPal2 ):
-        return (True, *merge_pal(a, i1, j1, i2, j2))
-    elif( isPal1 ):
-        match, i3, j3 = matchReverse(a, i1, j1, i2, j2)
-        #print(match, i3, j3, i1, j1, i2, j2, len1, len2)
-        if( not match ): # expected
-          if( j3-i3+1 > len1 ):
-            return (True, i3, j3)
-          else:
-            return (True, i1, j1)
-        else:
-          return (True, i1, j2)
-    elif( isPal2 ):
-        match, i3, j3 = matchReverse(a, i1, j1, i2, j2)
-        if( not match ): # expected
-          if( j3-i3+1 > len2 ):
-            return (True, i3, j3)
-          else:
-            return (True, i2, j2)
-        else:
-          return (True, i1, j2)
-    else:
-        match, i3, j3 = matchReverse(a, i1, j1, i2, j2)
-        if( match ):
-          return (True, i1, j2)
-        else:
-          len3 = j3-i3+1
-          if( len3 >= len1 ):
-            return (True, i3, j3)
-          else: # find pal string within remaining two first and second halfs
-            isPal4, i4, j4 = question2_helper(a, i1, i3-1)
-            isPal5, i5, j5 = question2_helper(a, j3+1, j2)
-            if( isPal4 and isPal5 ):
-              len4 = j4-i4+1
-              len5 = j5-i5+1
-              # return maximum of three
-              if( len3 >= len4 ):
-                if( len3 >= len5 ):
-                  return (True, i3, j3)
-                else:
-                  return (True, i5, j5)
-              elif( len4 >= len5 ):
-                  return (True, i4, j4)
-              else:
-                  return (True, i5, j5)
-            elif( isPal4 ):
-              if( len3 >= j4-i4+1 ):
-                return (True, i3, j3)
-              else:
-                return (True, i4, j4)
-            elif( isPal5 ):
-              if( len3 >= j5-i5+1 ):
-                return (True, i3, j3)
-              else:
-                return (True, i5, j5)
-            else: # return middle pal
-                return (True, i3, j3)
-              
-    # Fallback, no real palindrome found!
-    return (False, i, j)
-
-def question2_1(a):
-    """
-    Given a string "a", returns the longest palindromic substring contained in "a"
-    ARGUMENTS: String "a" for which longest palindromic substring is to be extracted
-    MODIFIES: None
-    RETURN: Longest palindromic substring in string "a"
-    """
-
-    isPal, i, j = question2_helper(a, 0, len(a)-1)
-    if( isPal ):
-      return a[i:j+1]
-    else:
-      return "OOPS! Something went Wrong!"
-
-
+# Find longest palindrome match in a string with given centers
 def matchCenter(s, n, i1, i2):
     matchWhole = True
     for i, j in zip(range(i1, -1, -1), range(i2, n)):
@@ -219,32 +121,42 @@ def matchCenter(s, n, i1, i2):
       return (i+1, j-1)
 
 def lenStr( curIdx ):
-  return (curIdx[1]-curIdx[0]+1)
+    return (curIdx[1]-curIdx[0]+1)
   
 def question2(a):
-  size = len(a)
-  if( size == 0 ):
-    return ""
+    """
+    Given a string "a", returns the longest palindromic substring contained in "a"
+    ARGUMENTS: String "a" for which longest palindromic substring is to be extracted
+    MODIFIES: None
+    RETURN: Longest palindromic substring in string "a"
+    """
     
-  maxStr = (0, 0)
-  for i in range(0, size-1):
-    curStr = matchCenter(a, size, i, i)
-    if( lenStr(curStr) > lenStr(maxStr) ):
-      maxStr = curStr
-      
-    curStr = matchCenter(a, size, i, i+1)
-    if( lenStr(curStr) > lenStr(maxStr) ):
-      maxStr = curStr
-      
-  return a[maxStr[0]:maxStr[1]+1]
-
-
+    # Trivial case
+    size = len(a)
+    if( size == 0 ):
+        return ""
     
+    # Iterate over whole string, keeping track of current maximum palindrome 
+    maxStr = (0, 0)
+    for i in range(0, size-1):
+        # Find all odd matches which have same center in a palindrome
+        curStr = matchCenter(a, size, i, i)
+        if( lenStr(curStr) > lenStr(maxStr) ):
+            maxStr = curStr
+      
+        # Find all even matches which have two centers in a palindrome
+        curStr = matchCenter(a, size, i, i+1)
+        if( lenStr(curStr) > lenStr(maxStr) ):
+            maxStr = curStr
+      
+    return a[maxStr[0]:maxStr[1]+1]
+
+# Helper method to find minimum spanning tree using prim's method   
 def primMST(G, s):
-    '''
+    """
     Minimum Spanning Tree (Prim's: Select the edges with minimum weight)
     Returns predecessor node of minimum spanning tree path to a node and dist from prdecessor dictionary
-    '''
+    """
     from heapq import heappush, heappop
     from collections import defaultdict
 
@@ -322,8 +234,7 @@ def buildBST(T, r):
         break
         
   return node
-        
-  
+          
 def question4(T, r, n1, n2):
     """
     Find the least common ancestor between two nodes on a binary search tree.
@@ -345,17 +256,20 @@ def question4(T, r, n1, n2):
     # Build the BST 
     root = buildBST(T, r)
     
-    # Find the root node whose value is between given n1 and n2
+    # Traverse BST from root to find the parent node whose value is between
+    # given n1 and n2
     while(root is not None):
       if( (n1 < root.data < n2) or (n2 < root.data < n1) ):
         return root.data
       
-      # Keep seraching to left or right of tree based on which side our value lies  
+      # Keep searching to left or right of the tree based on which side our
+      # value lies  
       if( n1 < root.data ):
         root = root.left
       else:
         root = root.right
-        
+    
+    # Did not find common ancestor    
     return None 
 
 class Node(object):
@@ -378,22 +292,35 @@ def question5(ll, m):
     # Trivial case
     if( not ll or m < 0 ):
       return None
-      
+    
+    # We do not know the length of singly linked list to directly jump
+    # to "L-m" element like in indexable iterator. 
+    
+    # Instead of making two passes (first to find the length and second to
+    # advance to "L-m" element, traverse the list with two pointers in a single
+    # pass, where one tracks the end of list and another stays behind from it
+    # with "m" elements gap
     nxtNode = ll
     prevNode = ll
     count = 0
+    
+    # Keeping advancing two pointers (nxt, prev) with the gap of given
+    # "m" elements until we reach end of list
     while( nxtNode is not None ):
+      # Advance prev pointer only after we have created a gap of "m" elements
       if( count > m ):
+        # After "m" elemnts we advance "prev" in lockstep with "nxt"
         prevNode = prevNode.next
       
       count += 1  
       nxtNode = nxtNode.next
-        
+    
+    # Either the list is shorter than "m" elements or "prev" points to our
+    # "m" elements from end    
     if( count <= m ):
       return None
     else:
       return prevNode
-
 
 
 # Test Code
@@ -401,13 +328,15 @@ def question5(ll, m):
 # Only execute test code if called from main (i.e. not when it is imported as module)        
 if __name__ == "__main__":
 
+    print("Test cases for question1: checking for any anagram in a string")
     print(question1("Udacity", "ad"))
     print(question1("Udacity", "ty"))
     print(question1("Udacity", "uy"))
     print(question1("", "Hello"))
     print(question1("Hello", ""))
     print(question1("", ""))
-    
+ 
+    print("\nTest cases for question2: finding longest palindrome in a string")   
     print(question2("xabbay"))
     print(question2("xabcbay"))
     print(question2("xabbaabbay"))
@@ -418,6 +347,7 @@ if __name__ == "__main__":
     print(question2("abcdefg"))
     print(question2("a"))
     
+    print("\nTest cases for question3: finding minimum spanning tree of a graph")
     G = {'A': [('B', 2)], 'B': [('A', 2), ('C', 5)], 'C': [('B', 5)]}
     print(question3(G))
     G = {'A': [('B', 2), ('C', 3)], 'B': [('A', 2), ('C', 2)], 'C': [('B', 2), ('A', 3)]}
@@ -425,7 +355,46 @@ if __name__ == "__main__":
     G = {'A': [('B', 2), ('C', 3), ('D', 2)], 'B': [('A', 2), ('D', 1)], 'C': [('A', 3), ('D', 2)],
          'D': [('C', 2), ('B', 1), ('E', 1)], 'E': [('D', 1)]}
     print(question3(G))
-      
+    G = {'A': [('B', 10)], 'B': [('A', 10), ('C', 5), ('D', 3), ('E', 5)],
+         'C': [('B', 5), ('E', 3)], 'D': [('B', 3), ('E', 3)],
+         'E': [('F', 5), ('C', 3), ('D', 3)], 'F': [('E', 5)]}
+    print(question3(G))
+     
+    print("\nTest cases for question4: finding least common ancestor in a binary search tree")   
+    # Tree: 3->(0->1, 4)
+    T = [[0, 1, 0, 0, 0],
+         [0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0],
+         [1, 0, 0, 0, 1],
+         [0, 0, 0, 0, 0]]
+    print(question4(T, 3, 1, 4))
+    # Tree: 3->(1->(0,2), 4)
+    T = [[0, 0, 0, 0, 0],
+         [1, 0, 1, 0, 0],
+         [0, 0, 0, 0, 0],
+         [0, 1, 0, 0, 1],
+         [0, 0, 0, 0, 0]]
+    print(question4(T, 3, 0, 4))
+    print(question4(T, 3, 0, 2))
+    print(question4(T, 3, 1, 2))
+    # Tree: 4->(1->(0, 2)), (6->(5, 8->7))
+    T = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+         [1, 0, 1, 0, 0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0],
+         [0, 1, 0, 0, 0, 0, 1, 0, 0],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0, 1, 0, 0, 1],
+         [0, 0, 0, 0, 0, 0, 0, 0, 0],
+         [0, 0, 0, 0, 0, 0, 0, 1, 0]]
+    print(question4(T, 4, 0, 5))
+    print(question4(T, 4, 0, 2))
+    print(question4(T, 4, 2, 3))
+    print(question4(T, 4, 5, 7))
+    print(question4(T, 4, 5, 8))
+    print(question4(T, 4, 6, 7))
+        
+    print("\nTest cases for question5: finding m th element from end in singly linked list")
     ll = Node(1)
     node = ll
     for i in range(2, 12):
@@ -439,25 +408,7 @@ if __name__ == "__main__":
     print(question5(ll, 11))
     print(question5(None, 2))
     print(question5(ll, -2))
-        
-    T = [[0, 1, 0, 0, 0],
-         [0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0],
-         [1, 0, 0, 0, 1],
-         [0, 0, 0, 0, 0]]
-    print(question4(T, 3, 1, 4))
-    T = [[0, 0, 0, 0, 0],
-         [1, 0, 1, 0, 0],
-         [0, 0, 0, 0, 0],
-         [0, 1, 0, 0, 1],
-         [0, 0, 0, 0, 0]]
-    print(question4(T, 3, 0, 4))
-    print(question4(T, 3, 0, 2))
-    print(question4(T, 3, 1, 2))
-    
-
-    
-
+   
 
 
 
