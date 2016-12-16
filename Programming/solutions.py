@@ -247,10 +247,16 @@ def question4(T, r, n1, n2):
     MODIFIES: None
     RETURN: Least common ancestor node
     """
+    # Order the n1, n2 in increaseing order
+    if( n1 <= n2 ):
+        lower, upper = n1, n2
+    else:
+        lower, upper = n2, n1
+    
     # Trivial case
-    if( r == n1 or r == n2 ):
-      return None
-    elif( n1 < r < n2 ):
+    if( r == lower or r == upper ):
+      return r
+    elif( lower < r < upper ):
       return r
       
     # Build the BST 
@@ -259,12 +265,12 @@ def question4(T, r, n1, n2):
     # Traverse BST from root to find the parent node whose value is between
     # given n1 and n2
     while(root is not None):
-      if( (n1 < root.data < n2) or (n2 < root.data < n1) ):
+      if( (lower < root.data < upper) or (root.data == lower) or (root.data == upper)):
         return root.data
       
       # Keep searching to left or right of the tree based on which side our
       # value lies  
-      if( n1 < root.data ):
+      if( upper < root.data ):
         root = root.left
       else:
         root = root.right
@@ -377,6 +383,7 @@ if __name__ == "__main__":
     print(question4(T, 3, 0, 4))
     print(question4(T, 3, 0, 2))
     print(question4(T, 3, 1, 2))
+    print(question4(T, 3, 4, 3))
     # Tree: 4->(1->(0, 2)), (6->(5, 8->7))
     T = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
          [1, 0, 1, 0, 0, 0, 0, 0, 0],
