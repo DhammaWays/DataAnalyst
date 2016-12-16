@@ -1,0 +1,74 @@
+Technical Interview Questions Explanations
+Udacity Data Analyst Nanodegree
+Lekhraj Sharma
+Dec 2016
+
+Question1: Checks whether some anagram of "t" is a substring of "s"
+
+Initially I approached this problem as finding all permutations of "t" and checking if anyone
+of them is present in "s". I have left this code as question1_0 in python file. If length of
+our anagram string "t" is "k" and length of string "s" is "n", we are making close to k! (number of permutations)
+times k*(n-k+1) comparisions. This naive approach time complexity is quite high O(n! * n^2),
+not practical for large "n". Later on learning about an observation that two strings are anagram of
+each other if and only if character frequency in them is same (e.g. "bac" which is an anagram
+of "abc" has exactly same chraracter count: a:1, b:1, c:1). This led to a linear time algorithm
+where we compare the character counts in a sliding window fashion with one pass. Python data
+structure of "Counter" came quite handy to maintain and compare character counts. Passed indices
+into original string around to save time in copying substrings. Comparing of sliding window
+character count can be done in constant time (atmost k comparisons) and atmost we have to do it "n"
+times. This results is time cmplexity of O(n). Our space complexity is limited to use of two Counter
+objects of fixed size of length "k" (size of "t"), so space complexity is O(1) as it does not
+grow with size "n" of given string "s".
+
+Question2: Find longest palindrome in give string
+
+My first attempt to solve this problem involved checking for a presence of palindrome via regular
+expression starting from largest "n" size downwards. I have left this code as question2_0 in
+python file. If length of string is "n" and we are checking for "k" length palindrome, each
+palindrome check can around (k/2)*(n-k+1) comparisons, which is order n^2. Since we need to make
+this check for "n" palindromes, our overall time complexity is O(n^3), quite high. Later on 
+learning about observation (as seen in regular expression pattern as well) that a plaindrome
+can be checked around its center. We iterate over string and for each pass we can find maximum
+possible palindrome of length "k". Each palindrome check via its center takes around "k/2"
+comparisons (maxing out at n/2). Since we are checking for both even and odd centers, they
+add up to around "n" comparison per pass. As we are making "n" passes, this results in time
+complexity of O(n^2). Our space usage is negligible as we are only holding start and end index
+of maximum palindrome, so clearly space complexity is O(1).
+
+Question3: Find minimum spanning tree of a graph
+
+Used Prim's algorithm to find mimimum spanning tree of given graph. We end up interating over
+"n" nodes of graph pushing its number edges (E) in our mimimum heap which can be a "log n"
+operation to maintain minimum order of heap. Picking up minimum node to traverse each time is 
+just a simple pop operation with order of 1. Since we end up pushing at most all reachable "E"
+edges in graph in these iterations and each push can be done in "log n", our time complexity
+is O(E * log n). Froms space perspective, we use three main data structures, minimum heap, node
+predecessor and distance dictionaries. At most minimum heap grows up to contain around number of edges
+"E" and other two dictionaries are at most "n" nodes. So our space complexity is O(E+n). In an
+undirected graph of "n" nodes, one can have atmost n*(n-1)/2 edges (E). Our time and space
+complexity is propotionate to density of edges in graph (sparse taking lesser time and space
+than denser graph).
+
+Question4: Find least common ancestor of a binary search tree
+
+Wrote a binary tree traversal algorithm where we take advantage of the fact any node in a binary
+search teer has all its left side childern's with lesser value and right side children's with
+larger value. Ended up creating a walkable binary search tree node based data structure from
+given matrix repersentation for easy traversal. We need to only go down at most height of the
+tree looking for node whose value lies between given two values. Height of our tree with "n"
+nodes is at most "log n", therefore our time complexity is O(log n). In terms of space usage,
+since we built a seperate binary tree data structure having "n" nodes instead of using the input
+matrix representation T, our space coplexity is O(n). If we discount building this alternate
+repersentation, our space complexity will be O(1).
+
+Question5: Find "m" th element from the end of a singly linked list
+
+In singly linked list of "n" nodes, the "m" th node from end is "n-m" th node from the
+head (front). To avoid making two passes (one to find length and one to traverse to desired
+node), walked two pointers with the gap of "m" nodes so that when we arrive at last node, our
+previous pointer is at the desired node. Since we are only making single pass of "n" nodes,
+our time complexity is O(n). Space wise we are just using two pointers (besides the input
+linked list itself), so clearly space complexity is O(1).
+
+
+
