@@ -51,15 +51,19 @@ than denser graph).
 
 Question4: Find least common ancestor of a binary search tree
 
-Wrote a binary tree traversal algorithm where we take advantage of the fact any node in a binary
+Wrote a binary tree traversal algorithm where we take advantage of the fact that any node in a binary
 search teer has all its left side childern's with lesser value and right side children's with
-larger value. Ended up creating a walkable binary search tree node based data structure from
-given matrix repersentation for easy traversal. We need to only go down at most height of the
-tree looking for node whose value lies between given two values. Height of our tree with "n"
-nodes is at most "log n", therefore our time complexity is O(log n). In terms of space usage,
-since we built a seperate binary tree data structure having "n" nodes instead of using the input
-matrix representation T, our space coplexity is O(n). If we discount building this alternate
-repersentation, our space complexity will be O(1).
+larger value. Initially ended up creating a walkable binary search tree node based data structure from
+given matrix repersentation for easy traversal. But when doing complexity analysis realized that
+it is adding n^2 time to build and taking n node extra space. Since we only traverse this tree once, decided
+to directly use supplied matrix T to save time and space. Left this earlier code as question4_0
+in python file. We need to only go down at most height of the tree looking for node whose value
+lies between given two values. Height of our tree with "n" nodes for a reasoanbly balanced tree is
+"log n" (for skewed tree it could go up to n-1), plus we make at most n/2 comparisons to find our
+left or right child in matrix T. Therefore our time complexity is O(n log n). This would have been
+just O(log n) if we were directly taking in tree input as a data structure that allowed us to get to
+left or right child in O(1) time. In terms of space usage, we are just using few simple variables,
+so our space complexity is cleatly O(1).
 
 Question5: Find "m" th element from the end of a singly linked list
 
