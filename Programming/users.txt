@@ -1,0 +1,14 @@
+1,'alex','alex@gmail.com','San Francisco','California',94101,True
+2,'burpy','burpy@yahoo.com','San Francisco','California',94102,True
+3,'cuty','cuty@gmail.com','San Ftrancisco','California',94101,False
+4,'doug','doug@gmail.com','Los Angeles','California',90001,True
+5,'ernie','ernie@yahoo.com','Los Angeles','California',90001,False
+6,'fred','fred@gmail.com','Huntsville','Alabama',35801,True
+7,'gumpy','gumpy@gmail.com','Freeport','Maine',04032,True
+8,'henry','henry@yahoo.com','Santa Fe','New Mexico',87500,True
+9,'ivory','ivory@gmail.com','Austin','Texas',78701,True
+10,'john','john@gmail.com','Austin','Texas',78702,False
+11,'jarvis','jarvis@gmail.com','Austin','Texas',78703,True
+12,'kron','kron@yahoo.com','Cleveland','Ohio',44101,False
+13,'lilly','lilly@yahoo.com','Logan ','Utah',84321,False
+14,'mark', 'mark@gmail.com','Cincinnati','Ohio',45201,True
