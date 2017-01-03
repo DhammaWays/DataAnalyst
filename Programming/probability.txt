@@ -1,0 +1,67 @@
+You are given a ten piece box of chocolate truffles. You know based on the label
+that six of the pieces have an orange cream filling and four of the pieces have
+a coconut filling. If you were to eat four pieces in a row, what is the
+probability that the first two pieces you eat have an orange cream filling and
+the last two have a coconut filling?
+
+Answer:
+First Method:
+Let us denote "O" for picking orange cream filling chocolate, and "C" for coconut
+filling chocolate. So our problem becomes:
+
+P(Picking "OOCC" in order)
+    = P(First as "O") * P(Second as "O") * P(Third as "C") * P(Fourth as "C")
+    
+P(First as "O") = 6/10 (since there are 6 organge ones out of total 10)
+P(Second as "O") = 5/9 (since there are now only 5 orange ones out of remaining total 9)
+P(Third as "C") = 4/8 (since we have 4 coconut ones out of remaining total 8)
+P(Fourth as "C") = 3/7 (since teher are now only 3 coconut ones out of remaining total 7)
+
+Therefore,
+P(Picking "OOCC" in order) = 6/10 * 5/9 * 4/8 * 3/7 = 1/14
+
+Second Method:
+Total possible ways to pick 4 chocolates of 10 = 10C4 = (10*9*8*7)/(4*3*2) = 210
+Ways to pick 2 orange chocolates out of 6 = 6C2 = (6*5)/2 = 15
+Ways to pick 2 coconut chocolates out of 4 = 4C2 = (4*3)/2 = 6
+
+Since we want to pick 2 orange first,
+P(Picking two oranges first) = 15/210 = 1/14
+
+Follow-up question: If you were given an identical box of chocolates and again
+eat four pieces in a row, what is the probability that exactly two contain
+coconut filling?
+
+Answer:
+
+First Method:
+Let us denote "O" for picking orange cream filling chocolate, and "C" for coconut
+filling chocolate.
+
+There are 6 ways (4C2) of picking exactly two coconut filling choclates out of 4.
+These are: OOCC, OCCO, CCOO, COCO, OCOC, COOC
+
+So, our probability becomes,
+
+P(Exactly two "CC") 
+    = P("OOCC") + P("OCCO") + P("CCOO") + P("COCO") + P("OCOC") + P("COOC")
+    = 6/10*5/9*4/8*3/7 + 6/10*4/9*3/8*5/7 + 4/10*3/9*6/8*5/7 + 4/10*6/9*3/8*5/7
+      + 6/10*4/9*5/8*3/7 + 4/10*6/9*5/8*3/7
+    = 1/14 + 1/14 + 1/14 + 1/14 + 1/14 + 1/14
+    = 6/14 = 3/7
+    
+Second Method:
+
+Total possible ways to pick 4 chocolates of 10 = 10C4 = (10*9*8*7)/(4*3*2) = 210
+Ways to pick 2 orange chocolates out of 6 = 6C2 = (6*5)/2 = 15
+Ways to pick 2 coconut chocolates out of 4 = 4C2 = (4*3)/2 = 6
+
+Since we want to exactly 2 coconut chocolates out of 4, it means we need to also
+pick 2 orange choclates.
+
+P(Picking exactly two coconut chocolates out of 4)
+    = P(Picking two chocolates AND Picking two orange chocolates)
+    = (6 * 15)/ 210
+    = 3/7
+    
+
