@@ -55,7 +55,7 @@ insert into users (id, username, email, city, state, zip, active) values
 +------+----------+------------------+----------------+------------+-------+--------+
 */
 -- Query to find the top 5 states with the highest number of active users. Include the number for each state in the query result
-select state, count(*) as num_active_users from users where active is True group by state order by count(*) desc, state limit 5;
+select state, count(*) as num_active_users from users where active is True group by state order by num_active_users desc, state limit 5;
 -- Expected Output
 /*
 +------------+------------------+

@@ -49,7 +49,7 @@ def uniqueFirstChar_1(S):
   # All are repeating characters    
   return None
   
-# Returns first unique charcter (non-repeating) across whole string
+# Returns first unique character (non-repeating) across whole string
 # We just make one pass and return the first element of our unique character set
 def uniqueFirstChar(S):
   from collections import OrderedDict
@@ -57,6 +57,10 @@ def uniqueFirstChar(S):
   dupSet = set()
   uniqueSet = OrderedDict()
   
+  ## Scan the given string in one pass, keeping track of duplicate
+  # and unique characters set. Chose “ordered” set for unique
+  # characters so that we can just return its first element.
+
   for c in S:
     if c not in dupSet:
       if c in uniqueSet:
@@ -64,7 +68,8 @@ def uniqueFirstChar(S):
         dupSet.add(c)
       else:
         uniqueSet[c] = None
-        
+  
+  # Return first unique character or None if no unique character is found      
   return next(iter(uniqueSet), None) 
   
   
